@@ -3,6 +3,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+DeepDream/SampleImages/
+DeepDream/outputs/
+DeepDream/uploads/
+
 # C extensions
 *.so
 
