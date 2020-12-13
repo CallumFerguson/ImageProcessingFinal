@@ -7,6 +7,7 @@ import os
 import DeepDream
 import math
 import time
+import base64
 
 UPLOAD_FOLDER = './uploads'
 ALLOWED_EXTENSIONS = {'jpg', 'png'}
@@ -36,12 +37,18 @@ def dream():
         new_name = "{}_{}_{}{}".format(name, dream.image_id, math.floor(time.time()), ext)
         file.save(os.path.join(app.config["UPLOAD_FOLDER"], new_name))
         dream.image_id += 1
-        DeepDream.run(new_name)
+        arguments = request.form.get("arguments")
+        arguments = json.loads(arguments)
+        DeepDream.run(new_name, arguments)
         name, _ = os.path.splitext(new_name)
-        return send_file(os.path.join("outputs", "{}.png".format(name)))
+        output_path = os.path.join("outputs", "{}.png".format(name))
+        with open(output_path, "rb") as image_file:
+            image_encoded_string = base64.b64encode(image_file.read())
+            image_string = image_encoded_string.decode("utf-8")
+        return json.dumps({'status' : "success", "image" : image_string}), 200, {'ContentType':'application/json'}
 
     return json.dumps({'status' : "file type not allowed"}), 200, {'ContentType':'application/json'}
 dream.image_id = 0
 
 if __name__ == '__main__':
-    app.run(host="127.0.0.1", port=2555, threaded=False)
+    app.run(host="0.0.0.0", port=2555, threaded=False)

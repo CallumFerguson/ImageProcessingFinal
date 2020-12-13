@@ -9,15 +9,147 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
+    <script>
+
+        $(() => {
+            document.getElementById("layer").oninput = () => {
+                document.getElementById("layerValue").innerHTML = "Layer: " + document.getElementById("layer").value;
+            };
+        });
+
+        function submit() {
+            $("#imgDiv").empty();
+
+            var files = document.getElementById("file").files;
+            if (files.length == 1) {
+                var display = $("#form").css("display");
+                $("#form").css("display", "none");
+                $("#loading").css("display", "block");
+                var fd = new FormData();
+                fd.append("file", files[0]);
+                fd.append("arguments", JSON.stringify({
+                    layer: $("#layer").val(),
+                    lr: $("#lr").val(),
+                    useOctaves: $("#useOctaves").is(":checked")
+                }));
+
+                $.ajax({
+                    url: "http://24.98.61.159:2555/dream",
+                    type: 'post',
+                    data: fd,
+                    contentType: false,
+                    processData: false,
+                    success: (data) => {
+                        $("#form").css("display", display);
+                        $("#loading").css("display", "none");
+                        data = JSON.parse(data);
+                        console.log(data.status);
+                        if (data.status == "success") {
+                            $("#imgDiv").append(`<img src=\"${"data:image/png;base64," + data.image}\" id=\"img\">`);
+                        }
+                        else {
+                            alert("Error.");
+                        }
+                    },
+                    error: (data) => {
+                        $("#form").css("display", display);
+                        $("#loading").css("display", "none");
+                        console.log("error");
+                        console.log(data);
+                        alert("Error.");
+                    }
+                });
+            }
+            else {
+                alert("Select a file.");
+            }
+        }
+
+    </script>
+
+    <style>
+        #formParent {
+            /* background-color: green; */
+            width: 100%;
+            height: 200px;
+            display: flex;
+            justify-content: center;
+        }
+
+        #form,
+        #loading {
+            background-color: white;
+            border: 3px solid black;
+            border-radius: 15px;
+            width: 250px;
+            height: 100%;
+            padding: 20px;
+        }
+
+        #loading {
+            display: none;
+        }
+
+        #imgDiv {
+            width: 700px;
+            height: 500px;
+            /* background-color: red; */
+            margin-top: 60px;
+        }
+
+        #img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        hr {
+            width: 100%;
+        }
+
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        body {
+            background-color: rgb(30, 55, 77);
+            display: flex;
+            flex-flow: wrap;
+            /* align-items: center; */
+            justify-content: center;
+            margin-top: 50px;
+        }
+    </style>
+
 </head>
 
 <body>
 
-    <form action="http://127.0.0.1:2555/dream" method="post" enctype="multipart/form-data">
-        Select image to upload:
-        <input type="file" name="file" id="file">
-        <input type="submit" value="Upload Image" name="submit">
-    </form>
+    <div id="formParent">
+        <div id="form">
+            <div id="layerValue">Layer: 26</div>
+            <input type="range" min="1" max="30" value="26" id="layer">
+            <br>
+            <div>Learning Rate:</div>
+            <input type="number" id="lr" name="lr" value="0.01">
+            <br>
+            <br>
+            <input type="checkbox" id="useOctaves" name="useOctaves" checked>
+            <label for="useOctaves">Use Octaves</label>
+            <br>
+            <br>
+            <input type="file" name="file" id="file">
+            <br>
+            <button type="button" onclick="submit()">Submit</button>
+        </div>
+        <div id="loading">
+            <p>Processing...</p>
+            <p>This may take some time.</p>
+        </div>
+    </div>
+    <div id="imgDiv"></div>
 
 </body>
 

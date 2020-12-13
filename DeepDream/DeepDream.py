@@ -148,17 +148,15 @@ def dreamUpscaleUncapped(network, input_image, parameter_group, upscale_scale, u
     
     return image
 
-def run(imageName):
-    #layer_cut, learning_rate, octave_scale, octaves, itertaions
-    default = (26, 0.0025, 1.5, 8, 30)
-    default2 = (31, 0.005, 1.5, 8, 30)
-    circles = (17, 0.0075, 1.5, 8, 30)
-    lines = (15, 0.0075, 1.5, 8, 30)
-    quick = (26, 0.0025, 1.5, 3, 30)
+def run(imageName, arguments):
+    default = (int(arguments["layer"]), float(arguments["lr"]), 1.5, 8, 10)
 
     image_name = os.path.join("uploads", imageName)
-    parameter_group = quick
-    method = 1 #0=octaves, 1=upscale, 2=upscale_uncapped
+    parameter_group = default
+    if arguments["useOctaves"]:
+        method = 0 #0=octaves, 1=upscale, 2=upscale_uncapped
+    else:
+        method = 1
 
     layer_cut, learning_rate, octave_scale, octaves, iterations = parameter_group
 
@@ -181,9 +179,9 @@ def run(imageName):
     elif method == 1:
         input_image, dreamed_image = dreamUpscale(network, input_image, parameter_group)
     else:
-        dreamed_image = dreamUpscaleUncapped(network, input_image, parameter_group, 1.5, 6)
+        dreamed_image = dreamUpscaleUncapped(network, input_image, parameter_group, 1.5, 2)
 
-    showImage(input_image, (10, 10))
-    showImage(dreamed_image, (10, 10))
+    # showImage(input_image, (10, 10))
+    # showImage(dreamed_image, (10, 10))
     name, ext = os.path.splitext(imageName)
     toPILImage(dreamed_image).save(os.path.join("outputs", "{}.png".format(name)))
