@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <title>Deep Dream</title>
+
+    <meta charset="utf-8">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <script>
+        // $(() => {
+        //     $.post("http://127.0.0.1:2555/dream", (data) => {
+        //         console.log(data);
+        //     });
+        // });
+        function submit() {
+            var files = document.getElementById("file").files;
+            if (files.length == 1) {
+                var myFormData = new FormData();
+                myFormData.append("file", files[0])
+
+                $.ajax({
+                    url: 'http://127.0.0.1:2555/dream',
+                    type: 'POST',
+                    processData: false,
+                    contentType: false,
+                    dataType: 'json',
+                    data: myFormData,
+                    success: (data) => {
+                        console.log(data);
+                    },
+                    error: (error) => {
+                        console.log(error);
+                    }
+                });
+            }
+        }
+    </script>
+
+</head>
+
+<body>
+
+    <input type="file" name="file" id="file">
+    <br>
+    <button type="button" onclick="submit()">Submit</button>
+
+</body>
+
+</html>
