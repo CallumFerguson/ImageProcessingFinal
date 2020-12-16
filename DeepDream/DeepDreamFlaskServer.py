@@ -47,7 +47,7 @@ def dream():
             image_string = image_encoded_string.decode("utf-8")
         return json.dumps({'status' : "success", "image" : image_string}), 200, {'ContentType':'application/json'}
 
-    return json.dumps({'status' : "file type not allowed"}), 200, {'ContentType':'application/json'}
+    return json.dumps({'status' : ".jpg and .png file types only."}), 200, {'ContentType':'application/json'}
 dream.image_id = 0
 
 if __name__ == '__main__':
